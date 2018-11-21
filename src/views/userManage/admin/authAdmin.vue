@@ -22,7 +22,7 @@
 
             <el-form-item>
                 <el-button-group>
-                    <el-button type="primary" icon="el-icon-refresh" @click="getList"></el-button>
+                    <el-button type="primary" icon="el-icon-refresh" @click="onRest"></el-button>
                     <el-button type="primary" icon="search" @click="onSubmit">查询</el-button>
                     <el-button type="primary" @click.native="handleForm(null,null)">新增</el-button>
                 </el-button-group>
@@ -55,13 +55,13 @@
                 :show-overflow-tooltip="true">
                 <template slot-scope="scope">
                     <i class="el-icon-time"></i>
-                    <span>{{ scope.row.last_login_time }}</span>
+                    <span>{{ scope.row.lastLoginTime | formatDateStr('yyyy-MM-dd hh:mm:ss') }}</span>
                 </template>
             </el-table-column>
             <el-table-column
                 label="登录IP">
                 <template slot-scope="scope">
-                    <span>{{ scope.row.last_login_ip }}</span>
+                    <span>{{ scope.row.lastLoginIp }}</span>
                 </template>
             </el-table-column>
             <el-table-column
@@ -209,6 +209,19 @@ export default {
         };
     },
     methods: {
+        onRest() {
+            this.$router.push({
+                path: ""
+            });
+            this.query = {
+                username: "",
+                status: "",
+                page: 1,
+                limit: 20,
+                role_id: ""
+            };
+            this.getList();
+        },
         onSubmit() {
             this.$router.push({
                 path: "",
