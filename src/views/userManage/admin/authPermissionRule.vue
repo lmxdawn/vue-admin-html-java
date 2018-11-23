@@ -1,16 +1,6 @@
 <template>
     <div>
         <el-form :inline="true" :model="query" class="query-form" size="mini">
-            <el-form-item class="query-form-item">
-                <el-input v-model="query.name" placeholder="角色名称"></el-input>
-            </el-form-item>
-            <el-form-item class="query-form-item">
-                <el-select v-model="query.status" placeholder="状态">
-                    <el-option label="全部" value=""></el-option>
-                    <el-option label="禁用" value="0"></el-option>
-                    <el-option label="正常" value="1"></el-option>
-                </el-select>
-            </el-form-item>
 
             <el-form-item>
                 <el-button-group>
@@ -86,8 +76,6 @@ export default {
         return {
             query: {
                 // pid: '',
-                name: "",
-                status: ""
             },
             mergeList: [],
             node: null,
@@ -144,6 +132,9 @@ export default {
             authPermissionRuleList(this.query)
                 .then(response => {
                     this.loading = false;
+                    if (response.code) {
+                        this.$message.error(response.message);
+                    }
                     this.mergeList = response.data.list || [];
                 })
                 .catch(() => {
@@ -187,41 +178,35 @@ export default {
                         .then(response => {
                             this.formLoading = false;
                             if (response.code) {
-                                this.$message({
-                                    message: response.message,
-                                    type: "error"
-                                });
-                            } else {
-                                this.$message({
-                                    message: "操作成功",
-                                    type: "success"
-                                });
-                                // 刷新表单
-                                this.$refs["dataForm"].resetFields();
-                                this.formVisible = false;
-                                if (this.formName !== "edit") {
-                                    const newChild = response.data || {};
-                                    if (this.pidData) {
-                                        if (!this.pidData.children) {
-                                            this.$set(
-                                                this.pidData,
-                                                "children",
-                                                []
-                                            );
-                                        }
-                                        this.pidData.children.push(newChild);
-                                    } else {
-                                        this.mergeList.push(newChild);
+                                this.$message.error(response.message);
+                                return false;
+                            }
+                            this.$message.success("删除成功");
+                            // 刷新表单
+                            this.$refs["dataForm"].resetFields();
+                            this.formVisible = false;
+                            if (this.formName !== "edit") {
+                                const newChild = response.data || {};
+                                if (this.pidData) {
+                                    if (!this.pidData.children) {
+                                        this.$set(
+                                            this.pidData,
+                                            "children",
+                                            []
+                                        );
                                     }
+                                    this.pidData.children.push(newChild);
                                 } else {
-                                    const parent = this.node.parent;
-                                    const children =
-                                        parent.data.children || parent.data;
-                                    const index = children.findIndex(
-                                        d => d.id === data.id
-                                    );
-                                    children.splice(index, 1, data);
+                                    this.mergeList.push(newChild);
                                 }
+                            } else {
+                                const parent = this.node.parent;
+                                const children =
+                                    parent.data.children || parent.data;
+                                const index = children.findIndex(
+                                    d => d.id === data.id
+                                );
+                                children.splice(index, 1, data);
                             }
                         })
                         .catch(() => {
@@ -249,33 +234,24 @@ export default {
                             .then(response => {
                                 this.deleteLoading = false;
                                 if (response.code) {
-                                    this.$message({
-                                        message: response.message,
-                                        type: "error"
-                                    });
-                                } else {
-                                    this.$message({
-                                        message: "删除成功",
-                                        type: "success"
-                                    });
-                                    const parent = node.parent;
-                                    const children =
-                                        parent.data.children || parent.data;
-                                    const index = children.findIndex(
-                                        d => d.id === data.id
-                                    );
-                                    children.splice(index, 1);
+                                    this.$message.error(response.message);
+                                    return false;
                                 }
+                                this.$message.success("删除成功");
+                                const parent = node.parent;
+                                const children =
+                                    parent.data.children || parent.data;
+                                const index = children.findIndex(
+                                    d => d.id === data.id
+                                );
+                                children.splice(index, 1);
                             })
                             .catch(() => {
                                 this.deleteLoading = false;
                             });
                     })
                     .catch(() => {
-                        this.$message({
-                            type: "info",
-                            message: "取消删除"
-                        });
+                        this.$message.error("取消删除");
                     });
             }
         }

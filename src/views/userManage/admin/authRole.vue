@@ -14,49 +14,50 @@
 
             <el-form-item>
                 <el-button-group>
-                    <el-button type="primary" icon="el-icon-refresh" @click="getList"></el-button>
+                    <el-button type="primary" icon="el-icon-refresh" @click="onRest"></el-button>
                     <el-button type="primary" icon="search" @click="onSubmit">查询</el-button>
                     <el-button type="primary" @click.native="handleForm(null,null)">新增</el-button>
                 </el-button-group>
             </el-form-item>
         </el-form>
-        <el-table
-            v-loading="loading"
-            :data="list"
-            style="width: 100%;"
-            max-height="500">
-            <el-table-column
-                label="角色 ID"
-                prop="id">
-            </el-table-column>
-            <el-table-column
-                label="角色名称"
-                prop="name">
-            </el-table-column>
-            <el-table-column
-                label="状态">
-                <template slot-scope="scope">
-                    <el-tag :type="scope.row.status | statusFilterType">{{scope.row.status | statusFilterName}}</el-tag>
-                </template>
-            </el-table-column>
-            <el-table-column
-                label="描述"
-                :show-overflow-tooltip="true">
-                <template slot-scope="scope">
-                    <span>{{ scope.row.remark }}</span>
-                </template>
-            </el-table-column>
-            <el-table-column
-                label="操作"
-                fixed="right"
-                width="200">
-                <template slot-scope="scope">
-                    <el-button type="text" size="small" @click.native="handleAuth(scope.row.id)">授权</el-button>
-                    <el-button type="text" size="small" @click.native="handleForm(scope.$index, scope.row)">编辑</el-button>
-                    <el-button type="text" size="small" @click.native="handleDel(scope.$index, scope.row)" :loading="deleteLoading">删除</el-button>
-                </template>
-            </el-table-column>
-        </el-table>
+        <el-scrollbar style="height: 85vh;" wrap-style="overflow-x: hidden;">
+            <el-table
+                v-loading="loading"
+                :data="list"
+                style="width: 100%;">
+                <el-table-column
+                    label="角色 ID"
+                    prop="id">
+                </el-table-column>
+                <el-table-column
+                    label="角色名称"
+                    prop="name">
+                </el-table-column>
+                <el-table-column
+                    label="状态">
+                    <template slot-scope="scope">
+                        <el-tag :type="scope.row.status | statusFilterType">{{scope.row.status | statusFilterName}}</el-tag>
+                    </template>
+                </el-table-column>
+                <el-table-column
+                    label="描述"
+                    :show-overflow-tooltip="true">
+                    <template slot-scope="scope">
+                        <span>{{ scope.row.remark }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column
+                    label="操作"
+                    fixed="right"
+                    width="200">
+                    <template slot-scope="scope">
+                        <el-button type="text" size="small" @click.native="handleAuth(scope.row.id)">授权</el-button>
+                        <el-button type="text" size="small" @click.native="handleForm(scope.$index, scope.row)">编辑</el-button>
+                        <el-button type="text" size="small" @click.native="handleDel(scope.$index, scope.row)" :loading="deleteLoading">删除</el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+        </el-scrollbar>
 
         <el-pagination
             :page-size="query.limit"
@@ -156,8 +157,8 @@ export default {
             authLoading: false,
             authFormVisible: false,
             authFormData: {
-                role_id: "",
-                auth_rules: []
+                roleId: "",
+                authRules: []
             },
             authDefaultCheckedKeys: [],
             index: null,
@@ -181,6 +182,15 @@ export default {
         };
     },
     methods: {
+        onRest() {
+            this.query = {
+                name: "",
+                status: "",
+                page: 1,
+                limit: 20
+            };
+            this.getList();
+        },
         onSubmit() {
             this.getList();
         },
@@ -193,6 +203,9 @@ export default {
             authRoleList(this.query)
                 .then(response => {
                     this.loading = false;
+                    if (response.code) {
+                        this.$message.error(response.message);
+                    }
                     this.list = response.data.list || [];
                     this.total = response.data.total || 0;
                 })
@@ -204,8 +217,8 @@ export default {
         },
         // 显示授权界面
         handleAuth(roleId) {
-            this.authFormData.role_id = roleId;
-            this.authFormData.auth_rules = [];
+            this.authFormData.roleId = roleId;
+            this.authFormData.authRules = [];
             this.authList = [];
             authRoleAuthList({ id: roleId })
                 .then(response => {
@@ -218,8 +231,8 @@ export default {
                         return;
                     }
                     this.authFormVisible = true;
-                    this.authList = response.data.auth_list || [];
-                    const checkedKeys = response.data.checked_keys || [];
+                    this.authList = response.data.list || [];
+                    const checkedKeys = response.data.checkedKeys || [];
                     let tempCheckedKeys = [];
                     let id = null;
                     let node = null;
@@ -268,7 +281,7 @@ export default {
                 arr = arr.concat(getNodeParents(node));
             }
             let setArr = new Set(arr);
-            this.authFormData.auth_rules = [...setArr];
+            this.authFormData.authRules = [...setArr];
             if (!this.authFormData) {
                 this.$alert("请至少选择一个权限", "提示", {
                     confirmButtonText: "确定"
@@ -276,21 +289,15 @@ export default {
                 return false;
             }
             authRoleAuth(this.authFormData)
-                .then(res => {
+                .then(response => {
                     this.authLoading = false;
-                    if (res.code) {
-                        this.$message({
-                            message: res.message,
-                            type: "error"
-                        });
-                    } else {
-                        this.$message({
-                            message: "授权成功",
-                            type: "success"
-                        });
-                        // 刷新表单
-                        this.authFormVisible = false;
+                    if (response.code) {
+                        this.$message.error(response.message);
+                        return false;
                     }
+                    this.$message.success("授权成功");
+                    // 刷新表单
+                    this.authFormVisible = false;
                 })
                 .catch(() => {
                     this.editLoading = false;
@@ -331,24 +338,18 @@ export default {
                         .then(response => {
                             this.formLoading = false;
                             if (response.code) {
-                                this.$message({
-                                    message: response.message,
-                                    type: "error"
-                                });
+                                this.$message.error(response.message);
+                                return false;
+                            }
+                            this.$message.success("删除成功");
+                            // 刷新表单
+                            this.$refs["dataForm"].resetFields();
+                            this.formVisible = false;
+                            if (this.formName === "add") {
+                                // 向头部添加数据
+                                this.list.unshift(response.data);
                             } else {
-                                this.$message({
-                                    message: "操作成功",
-                                    type: "success"
-                                });
-                                // 刷新表单
-                                this.$refs["dataForm"].resetFields();
-                                this.formVisible = false;
-                                if (this.formName === "add") {
-                                    // 向头部添加数据
-                                    this.list.unshift(response);
-                                } else {
-                                    this.list.splice(this.index, 1, data);
-                                }
+                                this.list.splice(this.index, 1, data);
                             }
                         })
                         .catch(() => {
@@ -370,28 +371,19 @@ export default {
                             .then(response => {
                                 this.deleteLoading = false;
                                 if (response.code) {
-                                    this.$message({
-                                        message: response.message,
-                                        type: "error"
-                                    });
-                                } else {
-                                    this.$message({
-                                        message: "删除成功",
-                                        type: "success"
-                                    });
-                                    // 刷新数据
-                                    this.list.splice(index, 1);
+                                    this.$message.error(response.message);
+                                    return false;
                                 }
+                                this.$message.success("删除成功");
+                                // 刷新数据
+                                this.list.splice(index, 1);
                             })
                             .catch(() => {
                                 this.deleteLoading = false;
                             });
                     })
                     .catch(() => {
-                        this.$message({
-                            type: "info",
-                            message: "取消删除"
-                        });
+                        this.$message.error("取消删除");
                     });
             }
         }
