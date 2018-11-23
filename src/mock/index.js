@@ -29,11 +29,6 @@ Mock.mock(
     authPermissionRule.index
 );
 Mock.mock(
-    /\/admin\/auth\/permission_rule\/tree/,
-    "get",
-    authPermissionRule.tree
-);
-Mock.mock(
     /\/admin\/auth\/permission_rule\/save/,
     "post",
     authPermissionRule.save
