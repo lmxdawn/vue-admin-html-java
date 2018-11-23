@@ -38,17 +38,6 @@
             width="85%"
             top="5vh">
             <el-form :model="formData" :rules="formRules" ref="dataForm">
-                <el-form-item label="父ID" prop="pid">
-                    <el-select v-model="formData.pid" placeholder="顶级">
-                        <el-option
-                            v-for="item in treeList"
-                            :key="item.id"
-                            :label="item.title"
-                            :value="item.id">
-                            <span style="float: left"><span v-html="item.html"></span>{{ item.title }}</span>
-                        </el-option>
-                    </el-select>
-                </el-form-item>
                 <el-form-item label="规则名" prop="name">
                     <el-input type="" v-model="formData.name" auto-complete="off"></el-input>
                 </el-form-item>
@@ -57,8 +46,8 @@
                 </el-form-item>
                 <el-form-item label="状态" prop="status">
                     <el-radio-group v-model="formData.status">
-                        <el-radio label="0">禁用</el-radio>
-                        <el-radio label="1">正常</el-radio>
+                        <el-radio :label="0">禁用</el-radio>
+                        <el-radio :label="1">正常</el-radio>
                     </el-radio-group>
                 </el-form-item>
                 <el-form-item label="额外的规则表达式">
@@ -85,10 +74,10 @@ import {
 } from "../../../api/auth/authPermissionRule";
 const formJson = {
     id: "",
-    pid: "2",
+    pid: 0,
     name: "",
     title: "",
-    status: "1",
+    status: 1,
     condition: "",
     listorder: 999
 };
@@ -174,14 +163,12 @@ export default {
         handleForm(node, data, formName) {
             this.formVisible = true;
             this.pidData = data || null;
-            formJson.pid = (data && parseInt(data.id)) || "";
+            formJson.pid = (data && parseInt(data.id)) || 0;
             this.formData = Object.assign({}, formJson);
             if (formName === "edit") {
                 this.formData = Object.assign({}, data);
                 this.node = node;
             }
-            this.formData.pid = !this.formData.pid ? "" : this.formData.pid;
-            this.formData.status += ""; // 转为字符串（解决默认选中的时候字符串和数字不能比较的问题）
             this.formName = formName;
             // 清空验证信息表单
             if (this.$refs["dataForm"]) {
@@ -212,7 +199,7 @@ export default {
                                 // 刷新表单
                                 this.$refs["dataForm"].resetFields();
                                 this.formVisible = false;
-                                if (this.formName === "add") {
+                                if (this.formName !== "edit") {
                                     const newChild = response.data || {};
                                     if (this.pidData) {
                                         if (!this.pidData.children) {

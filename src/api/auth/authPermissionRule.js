@@ -17,9 +17,9 @@ export function authPermissionRuleList(query) {
 // 保存
 export function authPermissionRuleSave(data, formName, method = "post") {
     let url =
-        formName === "edit"
-            ? "/admin/auth/permission_rule/edit"
-            : "/admin/auth/permission_rule/save";
+        formName !== "edit"
+            ? "/admin/auth/permission_rule/save"
+            : "/admin/auth/permission_rule/edit";
     return axios({
         url: url,
         method: method,
