@@ -123,3 +123,13 @@ input {
         }
     }
 }
+
+.table-scrollbar {
+    height: 75vh;
+}
+
+@media screen and (min-width: 1919px) {
+    .table-scrollbar {
+        height: 85vh;
+    }
+}

@@ -28,7 +28,7 @@
                 </el-button-group>
             </el-form-item>
         </el-form>
-        <el-scrollbar style="height: 75vh;" wrap-style="overflow-x: hidden;">
+        <el-scrollbar class="table-scrollbar" wrap-style="overflow-x: hidden;">
             <el-table
                 v-loading="loading"
                 :data="list"
