@@ -130,6 +130,12 @@ input {
 
 @media screen and (min-width: 1919px) {
     .table-scrollbar {
+        height: 80vh;
+    }
+}
+
+@media screen and (min-width: 2500px) {
+    .table-scrollbar {
         height: 85vh;
     }
 }
