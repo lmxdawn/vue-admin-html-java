@@ -330,7 +330,6 @@ export default {
     background-color: #545c64;
     transition: left 0.23s ease-in-out;
     height: 100%;
-    position: absolute !important;
 }
 .container-left-wrap {
     overflow-x: hidden !important;
@@ -482,7 +481,7 @@ export default {
     .container-left {
         margin-right: 0;
         opacity: 1;
-        position: absolute;
+        position: absolute !important;
         top: 0;
         left: -225px;
         z-index: 10;
