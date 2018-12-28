@@ -204,9 +204,7 @@ export default {
             if (this.ext) {
                 isExt = this.ext.indexOf(ext) >= 0;
                 if (!isExt) {
-                    this.$message.error(
-                        "文件只能为 " + this.ext + " 格式!"
-                    );
+                    this.$message.error("文件只能为 " + this.ext + " 格式!");
                     return false;
                 }
             }
