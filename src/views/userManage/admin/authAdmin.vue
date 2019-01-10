@@ -22,7 +22,7 @@
 
             <el-form-item>
                 <el-button-group>
-                    <el-button type="primary" icon="el-icon-refresh" @click="onRest"></el-button>
+                    <el-button type="primary" icon="el-icon-refresh" @click="onReset"></el-button>
                     <el-button type="primary" icon="search" @click="onSubmit">查询</el-button>
                     <el-button type="primary" @click.native="handleForm(null,null)">新增</el-button>
                 </el-button-group>
@@ -210,7 +210,7 @@ export default {
         };
     },
     methods: {
-        onRest() {
+        onReset() {
             this.$router.push({
                 path: ""
             });
@@ -267,14 +267,21 @@ export default {
         hideForm() {
             // 更改值
             this.formVisible = !this.formVisible;
-            // 清空表单
-            this.$refs["dataForm"].resetFields();
             return true;
+        },
+        // 刷新表单
+        resetForm() {
+            if (this.$refs["dataForm"]) {
+                // 清空验证信息表单
+                this.$refs["dataForm"].clearValidate();
+                // 刷新表单
+                this.$refs["dataForm"].resetFields();
+            }
         },
         // 显示表单
         handleForm(index, row) {
             this.formVisible = true;
-            this.formData = Object.assign({}, formJson);
+            this.formData = JSON.parse(JSON.stringify(formJson));
             if (row !== null) {
                 this.formData = Object.assign({}, row);
             }
@@ -286,10 +293,6 @@ export default {
                 this.index = index;
                 this.formName = "edit";
                 this.formRules = this.editRules;
-            }
-            // 清空验证信息表单
-            if (this.$refs["dataForm"]) {
-                this.$refs["dataForm"].clearValidate();
             }
         },
         formSubmit() {
@@ -304,18 +307,18 @@ export default {
                             return false;
                         }
                         this.$message.success("操作成功");
-                        // 向头部添加数据
-                        // this.list.unshift(res)
-                        // 刷新表单
-                        this.$refs["dataForm"].resetFields();
                         this.formVisible = false;
                         if (this.formName === "add") {
                             // 向头部添加数据
-                            let resData = response.data || {};
-                            this.list.unshift(resData);
+                            if (response.data && response.data.id) {
+                                data.id = response.data.id;
+                                this.list.unshift(data);
+                            }
                         } else {
                             this.list.splice(this.index, 1, data);
                         }
+                        // 刷新表单
+                        this.resetForm();
                     });
                 }
             });
@@ -328,6 +331,7 @@ export default {
                 })
                     .then(() => {
                         let para = { id: row.id };
+                        this.deleteLoading = true;
                         authAdminDelete(para)
                             .then(response => {
                                 this.deleteLoading = false;

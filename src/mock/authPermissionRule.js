@@ -244,15 +244,7 @@ const index = {
 
 const save = {
     data: {
-        id: "999",
-        pid: 0,
-        name: "admin/test/test",
-        title: "测试",
-        status: "1",
-        condition: "",
-        listorder: 999,
-        update_time: 1524812649,
-        create_time: 1524812649
+        id: 999
     }
 };
 

@@ -4,7 +4,7 @@
 
             <el-form-item>
                 <el-button-group>
-                    <el-button type="primary" icon="el-icon-refresh" @click="getList"></el-button>
+                    <el-button type="primary" icon="el-icon-refresh" @click="onReset"></el-button>
                     <el-button type="primary" icon="search" @click="onSubmit">查询</el-button>
                     <el-button type="primary" @click.native="handleForm(null,null)">新增</el-button>
                 </el-button-group>
@@ -124,6 +124,16 @@ export default {
             </span>
             </span>)
         },
+        onReset() {
+            this.$router.push({
+                path: ""
+            });
+            this.query = {
+                name: "",
+                status: ""
+            };
+            this.getList();
+        },
         onSubmit() {
             this.getList();
         },
@@ -142,12 +152,19 @@ export default {
                     this.mergeList = [];
                 });
         },
+        // 刷新表单
+        resetForm() {
+            if (this.$refs["dataForm"]) {
+                // 清空验证信息表单
+                this.$refs["dataForm"].clearValidate();
+                // 刷新表单
+                this.$refs["dataForm"].resetFields();
+            }
+        },
         // 隐藏表单
         hideForm() {
             // 更改值
             this.formVisible = !this.formVisible;
-            // 清空表单
-            this.$refs["dataForm"].resetFields();
             return true;
         },
         // 显示表单
@@ -155,16 +172,12 @@ export default {
             this.formVisible = true;
             this.pidData = data || null;
             formJson.pid = (data && parseInt(data.id)) || 0;
-            this.formData = Object.assign({}, formJson);
+            this.formData = JSON.parse(JSON.stringify(formJson));
             if (formName === "edit") {
                 this.formData = Object.assign({}, data);
                 this.node = node;
             }
             this.formName = formName;
-            // 清空验证信息表单
-            if (this.$refs["dataForm"]) {
-                this.$refs["dataForm"].clearValidate();
-            }
             if (data && data.id) {
                 this.index = this.mergeList.findIndex(d => d.id === data.id);
             }
@@ -182,22 +195,22 @@ export default {
                                 return false;
                             }
                             this.$message.success("删除成功");
-                            // 刷新表单
-                            this.$refs["dataForm"].resetFields();
                             this.formVisible = false;
                             if (this.formName !== "edit") {
-                                const newChild = response.data || {};
-                                if (this.pidData) {
-                                    if (!this.pidData.children) {
-                                        this.$set(
-                                            this.pidData,
-                                            "children",
-                                            []
-                                        );
+                                if (response.data && response.data.id) {
+                                    data.id = response.data.id;
+                                    if (this.pidData) {
+                                        if (!this.pidData.children) {
+                                            this.$set(
+                                                this.pidData,
+                                                "children",
+                                                []
+                                            );
+                                        }
+                                        this.pidData.children.push(data);
+                                    } else {
+                                        this.mergeList.push(data);
                                     }
-                                    this.pidData.children.push(newChild);
-                                } else {
-                                    this.mergeList.push(newChild);
                                 }
                             } else {
                                 const parent = this.node.parent;
@@ -208,6 +221,8 @@ export default {
                                 );
                                 children.splice(index, 1, data);
                             }
+                            // 刷新表单
+                            this.resetForm();
                         })
                         .catch(() => {
                             this.formLoading = false;

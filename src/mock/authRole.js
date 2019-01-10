@@ -11,7 +11,7 @@ const index = {
                 name: "超级管理员",
                 status: 1,
                 remark: "拥有网站最高管理员权限！",
-                create_time: 1329633709,
+                createTime: 1329633709,
                 listorder: 0
             }
         ]
@@ -20,11 +20,7 @@ const index = {
 
 const save = {
     data: {
-        id: "2",
-        name: "test",
-        status: "1",
-        remark: "测试",
-        create_time: 1524812649
+        id: 2
     }
 };
 
@@ -33,11 +29,11 @@ const edit = { code: 0, message: "success" };
 const del = { code: 0, message: "success" };
 const authList = {
     data: {
-        auth_list: [
+        authList: [
             {
                 id: 1,
                 pid: 0,
-                name: "user_manage",
+                name: "userManage",
                 title: "用户管理",
                 status: 1,
                 condition: "",
@@ -46,7 +42,7 @@ const authList = {
                     {
                         id: 2,
                         pid: 1,
-                        name: "user_manage/admin",
+                        name: "userManage/admin",
                         title: "管理组",
                         status: 1,
                         condition: "",
@@ -222,7 +218,7 @@ const authList = {
                 ]
             }
         ],
-        checked_keys: []
+        checkedKeys: []
     }
 };
 

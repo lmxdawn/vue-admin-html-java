@@ -14,7 +14,7 @@
 
             <el-form-item>
                 <el-button-group>
-                    <el-button type="primary" icon="el-icon-refresh" @click="onRest"></el-button>
+                    <el-button type="primary" icon="el-icon-refresh" @click="onReset"></el-button>
                     <el-button type="primary" icon="search" @click="onSubmit">查询</el-button>
                     <el-button type="primary" @click.native="handleForm(null,null)">新增</el-button>
                 </el-button-group>
@@ -182,7 +182,10 @@ export default {
         };
     },
     methods: {
-        onRest() {
+        onReset() {
+            this.$router.push({
+                path: ""
+            });
             this.query = {
                 name: "",
                 status: "",
@@ -300,33 +303,35 @@ export default {
                     this.authFormVisible = false;
                 })
                 .catch(() => {
-                    this.editLoading = false;
+                    this.authLoading = false;
                 });
+        },
+        // 刷新表单
+        resetForm() {
+            if (this.$refs["dataForm"]) {
+                // 清空验证信息表单
+                this.$refs["dataForm"].clearValidate();
+                // 刷新表单
+                this.$refs["dataForm"].resetFields();
+            }
         },
         // 隐藏表单
         hideForm() {
             // 更改值
             this.formVisible = !this.formVisible;
-            // 清空表单
-            this.$refs["dataForm"].resetFields();
             return true;
         },
         // 显示表单
         handleForm(index, row) {
             this.formVisible = true;
-            this.formData = Object.assign({}, formJson);
+            this.formData = JSON.parse(JSON.stringify(formJson));
             if (row !== null) {
                 this.formData = Object.assign({}, row);
             }
-            this.formData.status += ""; // 转为字符串（解决默认选中的时候字符串和数字不能比较的问题）
             this.formName = "add";
             if (index !== null) {
                 this.index = index;
                 this.formName = "edit";
-            }
-            // 清空验证信息表单
-            if (this.$refs["dataForm"]) {
-                this.$refs["dataForm"].clearValidate();
             }
         },
         formSubmit() {
@@ -342,15 +347,18 @@ export default {
                                 return false;
                             }
                             this.$message.success("删除成功");
-                            // 刷新表单
-                            this.$refs["dataForm"].resetFields();
                             this.formVisible = false;
                             if (this.formName === "add") {
                                 // 向头部添加数据
-                                this.list.unshift(response.data);
+                                if (response.data && response.data.id) {
+                                    data.id = response.data.id;
+                                    this.list.unshift(data);
+                                }
                             } else {
                                 this.list.splice(this.index, 1, data);
                             }
+                            // 刷新表单
+                            this.resetForm();
                         })
                         .catch(() => {
                             this.formLoading = false;
