@@ -57,7 +57,7 @@
 </template>
 
 <script>
-import { qiuNiuUpToken, uploadFile } from "../../api/file/upload";
+import { qiuNiuUpToken, createFile } from "../../api/file/upload";
 import { renderSize } from "../../filtres/index";
 
 export default {
@@ -156,15 +156,16 @@ export default {
                                 this.$message.error("出现未知问题，刷新页面");
                                 return;
                             }
-                            const url = response.data.upload_url;
+                            const url = response.data.uploadUrl;
                             const formData = new FormData();
-                            formData.append("token", response.data.up_token);
+                            formData.append("token", response.data.upToken);
                             formData.append("file", this.file);
-                            uploadFile(url, formData)
+                            createFile(url, formData)
                                 .then(response => {
                                     this.uploadLoading = false;
-                                    if (response.key) {
-                                        const filePath = response.key;
+                                    if (response.key || response.data.key) {
+                                        const filePath =
+                                            response.key || response.data.key;
                                         let _URL =
                                             window.URL || window.webkitURL;
                                         const filePathUrl = _URL.createObjectURL(

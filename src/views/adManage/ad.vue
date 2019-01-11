@@ -475,7 +475,6 @@ export default {
             this.loading = true;
             adList(this.query)
                 .then(response => {
-                    console.log(response);
                     this.loading = false;
                     this.list = response.data.list || [];
                     this.total = response.data.total || 0;

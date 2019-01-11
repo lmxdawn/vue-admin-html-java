@@ -60,7 +60,7 @@ Mock.mock(/\/admin\/auth\/role\/auth/, "post", authRole.auth);
 // 获取文件列表
 Mock.mock(/admin\/file\/upload\/qiuNiuUpToken/, "get", upload.qiuNiuUpToken);
 // 上传文件
-Mock.mock(/admin\/file\/upload\/create/, "post", upload.create);
+Mock.mock(/admin\/file\/upload\/createFile/, "post", upload.createFile);
 
 /**
  * 资源分组相关
@@ -79,7 +79,7 @@ Mock.mock(/admin\/file\/resource\/add/, "post", fileResource.add);
 
 // 广告位相关
 Mock.mock(/\/admin\/ad\/site\/index/, "get", adSite.index);
-Mock.mock(/\/admin\/ad\/site\/adList/, "get", adSite.adList);
+Mock.mock(/\/admin\/ad\/site\/adList/, "post", adSite.adList);
 Mock.mock(/\/admin\/ad\/site\/save/, "post", adSite.save);
 Mock.mock(/\/admin\/ad\/site\/edit/, "post", adSite.edit);
 Mock.mock(/\/admin\/ad\/site\/delete/, "post", adSite.del);

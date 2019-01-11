@@ -15,11 +15,11 @@ export function adSiteList(query) {
 }
 
 // 广告列表
-export function adSiteAdList(query) {
+export function adSiteAdList(data) {
     return axios({
         url: "/admin/ad/site/adList",
-        method: "get",
-        params: query
+        method: "post",
+        data: data
     });
 }
 

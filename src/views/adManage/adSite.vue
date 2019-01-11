@@ -38,7 +38,7 @@
                 prop="updateTime">
                 <template slot-scope="scope">
                     <i class="el-icon-time"></i>
-                    <span>{{ scope.row.modifiedTime }}</span>
+                    <span>{{ scope.row.modifiedTime | formatDateStr('yyyy-MM-dd hh:mm:ss') }}</span>
                 </template>
             </el-table-column>
             <el-table-column
@@ -234,7 +234,7 @@ export default {
                 return false;
             }
             this.queryAdIdAsyncLoading = true;
-            adSiteAdList({ adIds: adIds })
+            adSiteAdList(adIds)
                 .then(response => {
                     this.queryAdIdAsyncLoading = false;
                     let list = response.data.list;
